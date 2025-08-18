@@ -17333,10 +17333,10 @@
         (!selects.so.value || row[hierarchyKey] === selects.so.value)
       );
 
-      document.querySelectorAll(".col-tsm").forEach(el => el.style.display = (isSO || isTSM) ? "none" : "table-cell");
+      document.querySelectorAll(".col-tsm").forEach(el => el.style.display = (isSO || isTSM || isUser) ? "none" : "table-cell");
       document.querySelectorAll(".col-so").forEach(el => el.style.display = "table-cell");
       document.querySelectorAll(".col-user").forEach(el => el.style.display = "table-cell");
-      document.querySelectorAll(".col-available_only_in_images").forEach(el => el.style.display = isSO ? "none" : "table-cell");
+      document.querySelectorAll(".col-available_only_in_images").forEach(el => el.style.display = (isSO || isUser) ? "none" : "table-cell");
 
       tbody.innerHTML = "";
       cards.innerHTML = "";
