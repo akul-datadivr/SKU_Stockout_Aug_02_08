@@ -17474,7 +17474,7 @@
     function initializeFilters() {
       selects.hierarchy.addEventListener("change", () => {
         const label = document.getElementById("so-label");
-        const selected = selects.hierarchy.value || 'SO/TSM';
+        const selected = selects.hierarchy.value || 'TSM/SO/User';
         label.innerHTML = `${selected}:<select id="so"><option value="">All ${selected}</option></select>`;
         selects.so = document.querySelector("#so");
         populate(selects.so, selected, data);
