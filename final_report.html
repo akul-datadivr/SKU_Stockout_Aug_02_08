@@ -17229,6 +17229,7 @@
     const tbody = document.getElementById("report-body");
     const table = document.getElementById("data-table");
     const cards = document.getElementById("card-view");
+    const thead = document.querySelector("#data-table thead");
 
     const params = new URLSearchParams(window.location.search);
     const preselectedHierarchy = params.get("hierarchy") || "";
@@ -17333,6 +17334,47 @@
         (!selects.so.value || row[hierarchyKey] === selects.so.value)
       );
 
+      // Build header per view
+      if (isSO || isUser) {
+        thead.innerHTML = `
+          <tr>
+            <th>Territory</th>
+            <th>Beat</th>
+            <th>Outlet ERP ID</th>
+            <th>Outlet Name</th>
+            <th>Entity Name</th>
+            <th>Out of Stock</th>
+          </tr>`;
+      } else if (isTSM) {
+        thead.innerHTML = `
+          <tr>
+            <th>SO</th>
+            <th>User</th>
+            <th>Territory</th>
+            <th>Beat</th>
+            <th>Outlet ERP ID</th>
+            <th>Outlet Name</th>
+            <th>Entity Name</th>
+            <th>Out of Stock</th>
+            <th>Available only in Images</th>
+          </tr>`;
+      } else {
+        // Master view
+        thead.innerHTML = `
+          <tr>
+            <th>TSM</th>
+            <th>SO</th>
+            <th>User</th>
+            <th>Territory</th>
+            <th>Beat</th>
+            <th>Outlet ERP ID</th>
+            <th>Outlet Name</th>
+            <th>Entity Name</th>
+            <th>Out of Stock</th>
+            <th>Available only in Images</th>
+          </tr>`;
+      }
+
       document.querySelectorAll(".col-tsm").forEach(el => el.style.display = (isSO || isTSM || isUser) ? "none" : "table-cell");
       document.querySelectorAll(".col-so").forEach(el => el.style.display = "table-cell");
       document.querySelectorAll(".col-user").forEach(el => el.style.display = "table-cell");
@@ -17377,20 +17419,50 @@
         table.classList.remove("hidden");
         cards.classList.add("hidden");
         filtered.forEach(row => {
-          const tr = document.createElement("tr");
+        const tr = document.createElement("tr");
+
+        if (isSO || isUser) {
+          // Lean 6-column view for SO/User
           tr.innerHTML = `
-            ${!(isSO || isTSM || isUser) ? `<td class="col-tsm">${row.TSM}</td>` : ""}
-            <td class="col-so">${row.SO ?? '-'}</td>
-            ${(isTSM || (!(isSO || isUser))) ? `<td class="col-user">${row.User ?? '-'}</td>` : ""}
-            <td>${row.Territory}</td>
-            <td>${row.Beats}</td>
-            <td>${row.Outlet_ERP_ID}</td>
-            <td>${row.Outlets_Name}</td>
-            <td>${row.Entity_Name}</td>
-            <td>${row.Out_of_Stock}</td>
-            ${!isSO ? `<td class="col-available_only_in_images">${row.Available_only_in_images}</td>` : ""}`;
-          tbody.appendChild(tr);
-        });
+            <td>${row.Territory ?? '-'}</td>
+            <td>${row.Beats ?? row.Beat ?? '-'}</td>
+            <td>${row.Outlet_ERP_ID ?? row['Outlet ERP ID'] ?? '-'}</td>
+            <td>${row.Outlets_Name ?? row['Outlet Name'] ?? '-'}</td>
+            <td>${row.Entity_Name ?? row['Entity Name'] ?? '-'}</td>
+            <td>${row.Out_of_Stock ?? row['Out of Stock'] ?? '-'}</td>
+          `;
+        } else if (isTSM) {
+          // TSM view: SO + User + full set
+          tr.innerHTML = `
+            <td>${row.SO ?? '-'}</td>
+            <td>${row.User ?? '-'}</td>
+            <td>${row.Territory ?? '-'}</td>
+            <td>${row.Beats ?? row.Beat ?? '-'}</td>
+            <td>${row.Outlet_ERP_ID ?? row['Outlet ERP ID'] ?? '-'}</td>
+            <td>${row.Outlets_Name ?? row['Outlet Name'] ?? '-'}</td>
+            <td>${row.Entity_Name ?? row['Entity Name'] ?? '-'}</td>
+            <td>${row.Out_of_Stock ?? row['Out of Stock'] ?? '-'}</td>
+            <td>${row.Available_only_in_images ?? '-'}</td>
+          `;
+        } else {
+          // Master view: TSM + SO + User + full set
+          tr.innerHTML = `
+            <td>${row.TSM ?? '-'}</td>
+            <td>${row.SO ?? '-'}</td>
+            <td>${row.User ?? '-'}</td>
+            <td>${row.Territory ?? '-'}</td>
+            <td>${row.Beats ?? row.Beat ?? '-'}</td>
+            <td>${row.Outlet_ERP_ID ?? row['Outlet ERP ID'] ?? '-'}</td>
+            <td>${row.Outlets_Name ?? row['Outlet Name'] ?? '-'}</td>
+            <td>${row.Entity_Name ?? row['Entity Name'] ?? '-'}</td>
+            <td>${row.Out_of_Stock ?? row['Out of Stock'] ?? '-'}</td>
+            <td>${row.Available_only_in_images ?? '-'}</td>
+          `;
+        }
+
+        tbody.appendChild(tr);
+      });
+
       }
 
       // ✅ This triggers shelf talker & facings when an outlet is selected
@@ -49628,7 +49700,6 @@
             </tbody>
           </table>
         `;
-
         document.getElementById(containerId).innerHTML = tableHTML;
       };
 
