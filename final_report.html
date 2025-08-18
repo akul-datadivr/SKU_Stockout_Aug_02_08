@@ -67,7 +67,6 @@
             <th class="col-tsm">TSM</th>
             <th class="col-so">SO</th>
             <th class="col-user">User</th>
-            <th>User</th>
             <th>Territory</th>
             <th>Beat</th>
             <th>Outlet ERP ID</th>
@@ -17335,8 +17334,8 @@
       );
 
       document.querySelectorAll(".col-tsm").forEach(el => el.style.display = (isSO || isTSM) ? "none" : "table-cell");
-      document.querySelectorAll(".col-so").forEach(el => el.style.display = isSO ? "none" : "table-cell");
-      document.querySelectorAll(".col-user").forEach(el => el.style.display = (isSO || isUser) ? "none" : "table-cell");
+      document.querySelectorAll(".col-so").forEach(el => el.style.display = "table-cell");
+      document.querySelectorAll(".col-user").forEach(el => el.style.display = "table-cell");
       document.querySelectorAll(".col-available_only_in_images").forEach(el => el.style.display = isSO ? "none" : "table-cell");
 
       tbody.innerHTML = "";
@@ -17381,9 +17380,8 @@
           const tr = document.createElement("tr");
           tr.innerHTML = `
             ${!(isSO || isTSM || isUser) ? `<td class="col-tsm">${row.TSM}</td>` : ""}
-            ${!(isSO || isUser) ? `<td class="col-so">${row.SO}</td>` : ""}
+            <td class="col-so">${row.SO ?? '-'}</td>
             ${(isTSM || (!(isSO || isUser))) ? `<td class="col-user">${row.User ?? '-'}</td>` : ""}
-            <td>${row.User ?? "-"}</td> 
             <td>${row.Territory}</td>
             <td>${row.Beats}</td>
             <td>${row.Outlet_ERP_ID}</td>
