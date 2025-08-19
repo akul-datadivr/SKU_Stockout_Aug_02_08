@@ -17216,6 +17216,10 @@
   </script>
 
   <script>
+    window.facingsAvailable = {};
+  </script>
+
+  <script>
     const data = window.stockoutData;
 
     const selects = {
@@ -49714,11 +49718,27 @@
         const totalMasala = Object.values(facingsMASALA).reduce((a, b) => a + b, 0);
         const totalSpice = Object.values(facingsSPICE).reduce((a, b) => a + b, 0);
 
+        const avail = (window.facingsAvailable || {})[outletId] || {};
+        const availMasala = (typeof avail.masala === "number") ? avail.masala : "-";
+        const availSpice  = (typeof avail.spice_powder === "number") ? avail.spice_powder : "-";
+
         document.getElementById("total-facing-summary").innerHTML = `
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
             <tr>
-              <td style="padding: 12px; border: 1px solid #ccc; font-weight: bold;">Total SKU Facing Count</td>
-              <td style="padding: 12px; border: 1px solid #ccc;">MASALA: ${totalMasala} &nbsp;&nbsp;|&nbsp;&nbsp; SPICE POWDER: ${totalSpice}</td>
+              <td style="padding: 12px; border: 1px solid #ccc; font-weight: bold;">
+                Total SKU Facing Count (from images)
+              </td>
+              <td style="padding: 12px; border: 1px solid #ccc;">
+                MASALA: ${totalMasala} &nbsp;&nbsp;|&nbsp;&nbsp; SPICE POWDER: ${totalSpice}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border: 1px solid #ccc; font-weight: bold;">
+                Total SKU Facing Count (available)
+              </td>
+              <td style="padding: 12px; border: 1px solid #ccc;">
+                MASALA: ${availMasala} &nbsp;&nbsp;|&nbsp;&nbsp; SPICE POWDER: ${availSpice}
+              </td>
             </tr>
           </table>
         `;
