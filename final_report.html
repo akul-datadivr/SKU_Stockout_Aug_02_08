@@ -17,8 +17,6 @@
     .report-table th { background: #2c3e50; color: white; padding: 10px; }
     .report-table td { padding: 10px; border: 1px solid #ccc; }
     .hidden { display: none; }
-    .select-search-wrap { display: flex; flex-direction: column; gap: 6px; }
-    .select-search { padding: 6px; font-size: 14px; border: 1px solid #bbb; border-radius: 4px; }
     .card { background: white; margin-bottom: 15px; padding: 15px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
     .card div { margin-bottom: 6px; font-size: 14px; }
     @media (min-width: 768px) {
@@ -17785,8 +17783,6 @@
       entity: document.getElementById("entity"),
       hierarchy: document.getElementById("hierarchy")
     };
-    addSearchableSelect(selects.beats, "Search beats…");
-    addSearchableSelect(selects.outlet, "Search outlet ERP ID…");
     const tbody = document.getElementById("report-body");
     const table = document.getElementById("data-table");
     const cards = document.getElementById("card-view");
@@ -18032,61 +18028,6 @@
       }
     }
 
-    /** Attach a search input to a <select>. */
-    function addSearchableSelect(selectEl, placeholder = "Search…") {
-      if (!selectEl || selectEl.dataset.searchAttached === "1") return;
-
-      // Wrap label > select in a container
-      const label = selectEl.closest("label") || selectEl.parentElement;
-      const wrapper = document.createElement("div");
-      wrapper.className = "select-search-wrap";
-      label.insertBefore(wrapper, selectEl);
-      wrapper.appendChild(selectEl);
-
-      // Insert the search box
-      const input = document.createElement("input");
-      input.type = "text";
-      input.className = "select-search";
-      input.placeholder = placeholder;
-      wrapper.insertBefore(input, selectEl);
-
-      // Keep a stable snapshot of original options (except the first "All …")
-      const original = Array.from(selectEl.options).map(o => ({ value: o.value, text: o.text }));
-
-      function filterOptions(q) {
-        const query = q.trim().toLowerCase();
-        // Rebuild options from snapshot to avoid residual hidden options
-        selectEl.innerHTML = "";
-        original.forEach((o, idx) => {
-          if (idx === 0) { // always keep the first "All ..." option
-            const opt = new Option(o.text, o.value);
-            selectEl.add(opt);
-            return;
-          }
-          if (!query || o.text.toLowerCase().includes(query)) {
-            const opt = new Option(o.text, o.value);
-            selectEl.add(opt);
-          }
-        });
-        // If current value is gone, reset to first option
-        if (![...selectEl.options].some(o => o.value === selectEl.value)) {
-          selectEl.selectedIndex = 0;
-          // Trigger change so your render() reacts
-          selectEl.dispatchEvent(new Event("change"));
-        }
-      }
-
-      input.addEventListener("input", () => filterOptions(input.value));
-      selectEl.dataset.searchAttached = "1";
-
-      // Expose a way to refresh the snapshot when you repopulate the select
-      selectEl.refreshSearchSnapshot = function () {
-        const opts = Array.from(selectEl.options).map(o => ({ value: o.value, text: o.text }));
-        original.length = 0; original.push(...opts);
-        filterOptions(input.value);
-      };
-    }
-
     function initializeFilters() {
       selects.hierarchy.addEventListener("change", () => {
         const label = document.getElementById("so-label");
@@ -18094,7 +18035,6 @@
         label.innerHTML = `${selected}:<select id="so"><option value="">All ${selected}</option></select>`;
         selects.so = document.querySelector("#so");
         populate(selects.so, selected, data);
-        addSearchableSelect(selects.so, `Search ${selected}…`);
         selects.so.addEventListener("change", render);
         render();
       });
@@ -18104,8 +18044,6 @@
         populate(selects.beats, "Beats", filtered);
         populate(selects.outlet, "Outlet_ERP_ID", filtered);
         populate(selects.entity, "Entity_Name", filtered);
-        if (selects.beats.refreshSearchSnapshot) selects.beats.refreshSearchSnapshot();
-        if (selects.outlet.refreshSearchSnapshot) selects.outlet.refreshSearchSnapshot();
         render();
       });
 
@@ -18115,8 +18053,6 @@
           (!selects.beats.value || d.Beats === selects.beats.value));
         populate(selects.outlet, "Outlet_ERP_ID", filtered);
         populate(selects.entity, "Entity_Name", filtered);
-        if (selects.beats.refreshSearchSnapshot) selects.beats.refreshSearchSnapshot();
-        if (selects.outlet.refreshSearchSnapshot) selects.outlet.refreshSearchSnapshot();
         render();
       });
 
@@ -18128,10 +18064,6 @@
       populate(selects.outlet, "Outlet_ERP_ID");
       populate(selects.so, "SO");
       populate(selects.entity, "Entity_Name");
-
-      if (selects.beats.refreshSearchSnapshot) selects.beats.refreshSearchSnapshot();
-      if (selects.outlet.refreshSearchSnapshot) selects.outlet.refreshSearchSnapshot();
-      if (selects.so.refreshSearchSnapshot) selects.so.refreshSearchSnapshot();
 
       render();
     }
@@ -18149,7 +18081,6 @@
         selects.so = document.querySelector("#so");
         const init = () => {
           populate(selects.so, preselectedHierarchy, data);
-          addSearchableSelect(selects.so, `Search ${preselectedHierarchy}…`);
           selects.so.value = preselectedName;
           render();
         };
